@@ -76,6 +76,8 @@ export async function executeMethod(
         sdkSnippet,
         typeDefinition: meta.typeDefinition,
         docsUrl: meta.docsUrl,
+        methodName: method,
+        resolvedParams: sdkParams,
       },
     };
   } catch (error) {
@@ -94,7 +96,8 @@ async function callSdkMethod(
   params: Record<string, string | number | boolean>
 ): Promise<unknown> {
   switch (method) {
-    // Market Data
+    // ============ Market Data ============
+
     case 'allMids':
       return await sdk.allMids();
 
@@ -121,10 +124,11 @@ async function callSdkMethod(
     case 'spotMeta':
       return await sdk.spotMeta();
 
-    case 'metaAndAssetCtxs': {
-      const client = sdk.getInfoClient();
-      return await client.metaAndAssetCtxs();
-    }
+    case 'metaAndAssetCtxs':
+      return await sdk.metaAndAssetCtxs();
+
+    case 'spotMetaAndAssetCtxs':
+      return await sdk.spotMetaAndAssetCtxs();
 
     case 'predictedFundings':
       return await sdk.predictedFundings();
@@ -136,7 +140,20 @@ async function callSdkMethod(
         params.endTime as number | undefined
       );
 
-    // User Data
+    case 'allPerpMetas':
+      return await sdk.allPerpMetas();
+
+    case 'tokenDetails':
+      return await sdk.tokenDetails(params.tokenId as string);
+
+    case 'perpsAtOpenInterestCap':
+      return await sdk.perpsAtOpenInterestCap();
+
+    case 'maxMarketOrderNtls':
+      return await sdk.maxMarketOrderNtls();
+
+    // ============ User Data ============
+
     case 'clearinghouseState':
       return await sdk.clearinghouseState(params.user as string);
 
@@ -146,10 +163,8 @@ async function callSdkMethod(
     case 'openOrders':
       return await sdk.openOrders(params.user as string);
 
-    case 'frontendOpenOrders': {
-      const client = sdk.getInfoClient();
-      return await client.frontendOpenOrders({ user: params.user as string });
-    }
+    case 'frontendOpenOrders':
+      return await sdk.frontendOpenOrders(params.user as string);
 
     case 'userFills':
       return await sdk.userFills(
@@ -157,14 +172,12 @@ async function callSdkMethod(
         params.aggregateByTime as boolean | undefined
       );
 
-    case 'userFillsByTime': {
-      const client = sdk.getInfoClient();
-      return await client.userFillsByTime({
-        user: params.user as string,
-        startTime: params.startTime as number,
-        endTime: params.endTime as number | undefined,
-      });
-    }
+    case 'userFillsByTime':
+      return await sdk.userFillsByTime(
+        params.user as string,
+        params.startTime as number,
+        params.endTime as number | undefined
+      );
 
     case 'userFunding':
       return await sdk.userFunding(
@@ -179,7 +192,70 @@ async function callSdkMethod(
     case 'historicalOrders':
       return await sdk.historicalOrders(params.user as string);
 
-    // Staking
+    case 'orderStatus':
+      return await sdk.orderStatus(
+        params.user as string,
+        params.oid as number | string
+      );
+
+    case 'subAccounts':
+      return await sdk.subAccounts(params.user as string);
+
+    case 'portfolio':
+      return await sdk.portfolio(params.user as string);
+
+    case 'referral':
+      return await sdk.referral(params.user as string);
+
+    case 'userRole':
+      return await sdk.userRole(params.user as string);
+
+    case 'userTwapSliceFills':
+      return await sdk.userTwapSliceFills(params.user as string);
+
+    case 'userTwapSliceFillsByTime':
+      return await sdk.userTwapSliceFillsByTime(
+        params.user as string,
+        params.startTime as number,
+        params.endTime as number | undefined
+      );
+
+    case 'twapHistory':
+      return await sdk.twapHistory(params.user as string);
+
+    case 'userNonFundingLedgerUpdates':
+      return await sdk.userNonFundingLedgerUpdates(
+        params.user as string,
+        params.startTime as number,
+        params.endTime as number | undefined
+      );
+
+    case 'userRateLimit':
+      return await sdk.userRateLimit(params.user as string);
+
+    case 'extraAgents':
+      return await sdk.extraAgents(params.user as string);
+
+    case 'isVip':
+      return await sdk.isVip(params.user as string);
+
+    case 'userDexAbstraction':
+      return await sdk.userDexAbstraction(params.user as string);
+
+    case 'maxBuilderFee':
+      return await sdk.maxBuilderFee(
+        params.user as string,
+        params.builder as string
+      );
+
+    case 'activeAssetData':
+      return await sdk.activeAssetData(
+        params.user as string,
+        params.coin as string
+      );
+
+    // ============ Staking ============
+
     case 'validatorSummaries':
       return await sdk.validatorSummaries();
 
@@ -189,7 +265,14 @@ async function callSdkMethod(
     case 'delegatorRewards':
       return await sdk.delegatorRewards(params.user as string);
 
-    // Vaults
+    case 'delegations':
+      return await sdk.delegations(params.user as string);
+
+    case 'delegatorHistory':
+      return await sdk.delegatorHistory(params.user as string);
+
+    // ============ Vaults ============
+
     case 'vaultSummaries':
       return await sdk.vaultSummaries();
 
@@ -198,6 +281,76 @@ async function callSdkMethod(
         params.vaultAddress as string,
         params.user as string | undefined
       );
+
+    case 'userVaultEquities':
+      return await sdk.userVaultEquities(params.user as string);
+
+    case 'leadingVaults':
+      return await sdk.leadingVaults();
+
+    // ============ System ============
+
+    case 'exchangeStatus':
+      return await sdk.exchangeStatus();
+
+    case 'alignedQuoteTokenInfo':
+      return await sdk.alignedQuoteTokenInfo(params.token as number);
+
+    case 'gossipRootIps':
+      return await sdk.gossipRootIps();
+
+    case 'legalCheck':
+      return await sdk.legalCheck(params.user as string);
+
+    case 'preTransferCheck':
+      return await sdk.preTransferCheck(
+        params.user as string,
+        params.destination as string,
+        params.token as string,
+        params.amount as string
+      );
+
+    case 'perpDeployAuctionStatus':
+      return await sdk.perpDeployAuctionStatus();
+
+    case 'spotDeployState':
+      return await sdk.spotDeployState(params.user as string);
+
+    case 'spotPairDeployAuctionStatus':
+      return await sdk.spotPairDeployAuctionStatus();
+
+    case 'perpDexLimits':
+      return await sdk.perpDexLimits(params.dex as string);
+
+    case 'perpDexs':
+      return await sdk.perpDexs();
+
+    case 'liquidatable':
+      return await sdk.liquidatable();
+
+    case 'marginTable':
+      return await sdk.marginTable();
+
+    case 'subAccounts2':
+      return await sdk.subAccounts2(params.user as string);
+
+    case 'userToMultiSigSigners':
+      return await sdk.userToMultiSigSigners(params.user as string);
+
+    case 'webData2':
+      return await sdk.webData2(params.user as string);
+
+    case 'blockDetails':
+      return await sdk.blockDetails(params.height as number);
+
+    case 'txDetails':
+      return await sdk.txDetails(params.hash as string);
+
+    case 'userDetails':
+      return await sdk.userDetails(params.address as string);
+
+    case 'validatorL1Votes':
+      return await sdk.validatorL1Votes();
 
     default:
       throw new Error(`Method ${method} not implemented`);

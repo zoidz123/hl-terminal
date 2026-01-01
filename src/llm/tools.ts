@@ -19,7 +19,7 @@ export const tools: Anthropic.Tool[] = [
         },
         params: {
           type: "object",
-          description: "Method parameters",
+          description: "Method parameters. For user address params, the active wallet will be used if not provided.",
           properties: {
             coin: {
               type: "string",
@@ -27,7 +27,7 @@ export const tools: Anthropic.Tool[] = [
             },
             user: {
               type: "string",
-              description: "Wallet address (0x...)",
+              description: "Wallet address (0x...). Uses active wallet if not provided.",
             },
             startTime: {
               type: "number",
@@ -35,7 +35,7 @@ export const tools: Anthropic.Tool[] = [
             },
             endTime: {
               type: "number",
-              description: "End timestamp in milliseconds",
+              description: "End timestamp in milliseconds (optional)",
             },
             interval: {
               type: "string",
@@ -52,6 +52,46 @@ export const tools: Anthropic.Tool[] = [
             vaultAddress: {
               type: "string",
               description: "Vault address for vault queries",
+            },
+            oid: {
+              type: "number",
+              description: "Order ID for orderStatus queries",
+            },
+            builder: {
+              type: "string",
+              description: "Builder address for maxBuilderFee queries",
+            },
+            tokenId: {
+              type: "string",
+              description: "Token ID (hex string) for tokenDetails queries",
+            },
+            token: {
+              type: "number",
+              description: "Token index for alignedQuoteTokenInfo queries",
+            },
+            destination: {
+              type: "string",
+              description: "Destination address for preTransferCheck",
+            },
+            amount: {
+              type: "string",
+              description: "Amount for preTransferCheck",
+            },
+            dex: {
+              type: "string",
+              description: "DEX name for perpDexLimits (empty string for main dex)",
+            },
+            height: {
+              type: "number",
+              description: "Block height for blockDetails",
+            },
+            hash: {
+              type: "string",
+              description: "Transaction hash for txDetails",
+            },
+            address: {
+              type: "string",
+              description: "User address for userDetails",
             },
           },
         },

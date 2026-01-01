@@ -140,7 +140,7 @@ function findSimilarMethod(input: string): string | null {
 /**
  * Get example value for a parameter
  */
-function getExampleValue(paramName: string, paramType: string): string {
+function getExampleValue(paramName: string, paramType: string, activeWallet?: string): string {
   switch (paramName) {
     case 'coin':
       return 'BTC';
@@ -156,9 +156,29 @@ function getExampleValue(paramName: string, paramType: string): string {
     case 'vaultAddress':
       return '0x...';
     case 'user':
-      return '0x...';
+      return activeWallet || '0x...';
     case 'aggregateByTime':
       return 'true';
+    case 'builder':
+      return '0x...';
+    case 'tokenId':
+      return '0x...';
+    case 'token':
+      return '0';
+    case 'oid':
+      return '12345';
+    case 'destination':
+      return '0x...';
+    case 'amount':
+      return '100';
+    case 'dex':
+      return '';
+    case 'height':
+      return '1000000';
+    case 'hash':
+      return '0x...';
+    case 'address':
+      return activeWallet || '0x...';
     default:
       if (paramType === 'number') return '0';
       if (paramType === 'boolean') return 'true';
@@ -168,22 +188,34 @@ function getExampleValue(paramName: string, paramType: string): string {
 
 /**
  * Generate usage string for a method with example values
+ * @param methodName - The method name
+ * @param activeWallet - Optional active wallet address to use for user params
  */
-export function getMethodUsage(methodName: string): string {
+export function getMethodUsage(methodName: string, activeWallet?: string): string {
   const meta = methods[methodName];
   if (!meta) return '';
 
-  const requiredParams = meta.params
-    .filter((p) => p.required && !p.isUserAddress)
-    .map((p) => `${p.name}=${getExampleValue(p.name, p.type)}`)
-    .join(' ');
+  const paramParts: string[] = [];
 
-  const optionalParams = meta.params
-    .filter((p) => !p.required || p.isUserAddress)
-    .map((p) => `[${p.name}]`)
-    .join(' ');
+  for (const p of meta.params) {
+    if (p.isUserAddress) {
+      // For user address params: show the active wallet if available
+      if (activeWallet) {
+        paramParts.push(`${p.name}=${activeWallet}`);
+      } else if (!p.required) {
+        paramParts.push(`[${p.name}]`);
+      } else {
+        paramParts.push(`${p.name}=0x...`);
+      }
+    } else if (p.required) {
+      // Required non-user params get example values
+      paramParts.push(`${p.name}=${getExampleValue(p.name, p.type, activeWallet)}`);
+    } else {
+      // Optional non-user params shown in brackets
+      paramParts.push(`[${p.name}]`);
+    }
+  }
 
-  const allParams = [requiredParams, optionalParams].filter(Boolean).join(' ');
-
+  const allParams = paramParts.join(' ');
   return `/${methodName}${allParams ? ' ' + allParams : ''}`;
 }

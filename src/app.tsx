@@ -6,7 +6,7 @@ import { Output, type Message } from "./components/Output.js";
 import { Input } from "./components/Input.js";
 import { Setup } from "./components/Setup.js";
 import { CategoryMenu } from "./components/CategoryMenu.js";
-import { configExists, getEffectiveConfig, loadConfig, type Config } from "./config/index.js";
+import { configExists, getEffectiveConfig, loadConfig, getActiveWallet, type Config } from "./config/index.js";
 import { isSlashCommand, executeCommand, type ExecutionResult } from "./commands/index.js";
 import { streamChat } from "./llm/client.js";
 
@@ -176,6 +176,7 @@ export function App() {
           <CategoryMenu
             onSelect={handleCategorySelect}
             onCancel={handleCategoryCancel}
+            activeWallet={config ? getActiveWallet(config)?.address : undefined}
           />
         </Box>
       </Box>

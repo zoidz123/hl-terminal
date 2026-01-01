@@ -12,11 +12,12 @@ import { getMethodUsage } from '../commands/router.js';
 interface CategoryMenuProps {
   onSelect: (command: string) => void;
   onCancel: () => void;
+  activeWallet?: string;
 }
 
 type MenuState = 'categories' | 'methods';
 
-export function CategoryMenu({ onSelect, onCancel }: CategoryMenuProps) {
+export function CategoryMenu({ onSelect, onCancel, activeWallet }: CategoryMenuProps) {
   const [state, setState] = useState<MenuState>('categories');
   const [selectedCategory, setSelectedCategory] = useState(0);
   const [selectedMethod, setSelectedMethod] = useState(0);
@@ -61,7 +62,7 @@ export function CategoryMenu({ onSelect, onCancel }: CategoryMenuProps) {
         const method = flatMethods[selectedMethod];
         if (method) {
           // Generate a command template
-          const usage = getMethodUsage(method.name);
+          const usage = getMethodUsage(method.name, activeWallet);
           onSelect(usage);
         }
       }
